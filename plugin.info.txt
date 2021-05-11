@@ -1,0 +1,6 @@
+base	googlemaps3
+author	Bernard Condrau
+email	bernard@condrau.com
+date	2021-05-11
+name	Googlemaps3 Plugin (Google Maps V3, DokuWiki Hogfather)
+url		https://www.dokuwiki.org/plugin:googlemaps3
