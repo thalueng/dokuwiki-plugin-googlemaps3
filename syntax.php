@@ -239,6 +239,7 @@ class syntax_plugin_googlemaps3 extends DokuWiki_Syntax_Plugin {
 				$markers[$mark]['lng'] = is_numeric($marker['lng']) ? floatval($marker['lng']) : 0;
 			}
 			$markers[$mark]['icon'] = ($marker['icon'] && strpos($marker['icon'], '.') ? $this->getConf('path').$marker['icon'] : $marker['icon']);
+			$markers[$mark]['info'] = str_replace("\n","", p_render("xhtml", p_get_instructions($markers[$mark]['info']), $info));
 		}
 		return $markers;
     }
