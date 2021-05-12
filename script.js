@@ -3,7 +3,7 @@
  *
  * @license		GPL 3 (https://www.gnu.org/licenses/gpl-3.0.html)
  * @author		Bernard Condrau <bernard@condrau.com>
- * @version		2021-05-11, for Google Maps v3 API and DokuWiki Hogfather
+ * @version		2021-05-12, for Google Maps v3 API and DokuWiki Hogfather
  * @see			https://www.dokuwiki.org/plugin:googlemaps3
  * @see			https://www.dokuwiki.org/plugin:googlemaps
  * 
@@ -34,35 +34,67 @@ function initMap() {
 			rotateControl: googlemaps3[i].rotateControl,
 			fullscreenControl: googlemaps3[i].fullscreenControl,
 		});
+		if (googlemaps3[i].address != '') {
+			pantoMapAddress(googlemaps3[i].map,googlemaps3[i].address);
+		}
 		if (googlemaps3[i].marker && googlemaps3[i].marker.length > 0) {
-			for (j=0; j<googlemaps3[i].marker.length; j++) {
-				const marker = new google.maps.Marker({
-					position: {lat: googlemaps3[i].marker[j].lat, lng: googlemaps3[i].marker[j].lng},
-					map: googlemaps3[i].map,
-					title: googlemaps3[i].marker[j].title,
-					icon: googlemaps3[i].marker[j].icon,
-				});
-				if (googlemaps3[i].marker[j].img || googlemaps3[i].marker[j].info || googlemaps3[i].marker[j].dir) {
-					markerInfo =
-						'<div id="googlemaps3marker'+googlemaps3[i].marker[j].markerID+'" class="googlemaps3 markerinfo"'+(googlemaps3[i].marker[j].width ? ' style="width: '+googlemaps3[i].marker[j].width+'"' : '')+'>' +
-							(googlemaps3[i].marker[j].title ? '<h3>'+googlemaps3[i].marker[j].title+'</h3>' : '') +
-							(googlemaps3[i].marker[j].img ? '<img src="'+googlemaps3[i].marker[j].img+'" style="max-width: 100%">' : '') +
-							(googlemaps3[i].marker[j].info ? '<p>'+googlemaps3[i].marker[j].info+'</p>' : '') +
-							(googlemaps3[i].marker[j].dir ? '<p><a href="https://www.google.com/maps/dir/?api=1&destination='+googlemaps3[i].marker[j].lat+','+googlemaps3[i].marker[j].lng+'" target="_blank">'+googlemaps3[i].marker[j].dir+'</a></p>' : '') +
-						'</div>';
-					attachMarkerInfo(marker, markerInfo);
-				}
+			for (j=0; j<googlemaps3[i].marker.length; j++) if (googlemaps3[i].marker[j].lat=='address') {
+				attachAddressMarker(googlemaps3[i].map,googlemaps3[i].marker[j]);
+			} else {
+				attachMarker(googlemaps3[i].map,googlemaps3[i].marker[j]);
 			}
 		}
 		if (googlemaps3[i].kml != 'off') {
 			const georssLayer = new google.maps.KmlLayer({url: googlemaps3[i].kml, map: googlemaps3[i].map,});
 		}
 	}
-	
-	function attachMarkerInfo(marker, markerInfo) {
-		const infoWindow = new google.maps.InfoWindow({content: markerInfo,});
-		marker.addListener('click', () => {
-			infoWindow.open(marker.get("map"), marker);
+	function attachMarker(map, options, position) {
+		// location from latlng coordinates
+		if (position == null) {
+			position = {lat: options.lat, lng: options.lng};
+			origin = options.lat+','+options.lng;
+		// location from address
+		} else {
+			origin = options.lng;
+		}
+		const marker = new google.maps.Marker({
+			position: position,
+			map: map,
+			title: options.title,
+			icon: options.icon,
+		});
+		if (options.img || options.info || options.dir) {
+			markerInfo =
+				'<div id="googlemaps3marker'+options.markerID+'" class="googlemaps3 markerinfo"'+(options.width ? ' style="width: '+options.width+'"' : '')+'>' +
+					(options.title ? '<h3>'+options.title+'</h3>' : '') +
+					(options.img ? '<img src="'+options.img+'" style="max-width: 100%">' : '') +
+					(options.info ? '<p>'+options.info+'</p>' : '') +
+					(options.dir ? '<p><a href="https://www.google.com/maps/dir/?api=1&destination='+origin+'" target="_blank">'+options.dir+'</a></p>' : '') +
+				'</div>';
+			const infoWindow = new google.maps.InfoWindow({content: markerInfo,});
+			marker.addListener('click', () => {
+				infoWindow.open(map, marker);
+			});
+		}
+	}
+	function attachAddressMarker(map, options) {
+		const geocoder = new google.maps.Geocoder();
+		geocoder.geocode({'address': options.lng}, function(results, status) {
+			if (status=='OK') {
+				attachMarker(map, options, results[0].geometry.location);
+			} else {
+				console.log('Googlemaps3 Plugin: geocode failed, status='+status);
+			}
+		});
+	}
+	function pantoMapAddress(map, address) {
+		const geocoder = new google.maps.Geocoder();
+		geocoder.geocode({'address': address}, function(results, status) {
+			if (status=='OK') {
+				map.setCenter(results[0].geometry.location);
+			} else {
+				console.log('Googlemaps3 Plugin: geocode failed, status='+status);
+			}
 		});
 	}
 }

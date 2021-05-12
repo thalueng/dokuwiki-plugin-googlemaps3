@@ -4,7 +4,7 @@
  *
  * @license		GPL 3 (https://www.gnu.org/licenses/gpl-3.0.html)
  * @author		Bernard Condrau <bernard@condrau.com>
- * @version		2021-05-11, for Google Maps v3 API and DokuWiki Hogfather
+ * @version		2021-05-12, for Google Maps v3 API and DokuWiki Hogfather
  * @see			https://www.dokuwiki.org/plugin:googlemaps3
  * @see			https://www.dokuwiki.org/plugin:googlemaps
  * 
@@ -29,6 +29,7 @@ class syntax_plugin_googlemaps3 extends DokuWiki_Syntax_Plugin {
 		'height' => '',						// default style in css file
 		'lat'  => 12.57076,					// lat+lng are mandatory
 		'lng' => 99.96260,					// lat+lng are mandatory
+		'address' => '',
 		'zoom' => 0,						// zoom is mandatory
 		'language' => '',					// google maps defaults to language set in browser 
 		'region' => '',						// google maps defaults region bias to US
@@ -230,8 +231,13 @@ class syntax_plugin_googlemaps3 extends DokuWiki_Syntax_Plugin {
 		}
 		foreach ($markers as $mark => $marker) {
 			$markers[$mark]['markerID'] = ++$this->markerID;
-			$markers[$mark]['lat'] = is_numeric($marker['lat']) ? floatval($marker['lat']) : 0;
-			$markers[$mark]['lng'] = is_numeric($marker['lng']) ? floatval($marker['lng']) : 0;
+			if ($markers[$mark]['lat'] == 'address') {
+				$markers[$mark]['lat'] = "'".$markers[$mark]['lat']."'";
+				$markers[$mark]['lng'] = "'".$markers[$mark]['lng']."'";
+			} else {
+				$markers[$mark]['lat'] = is_numeric($marker['lat']) ? floatval($marker['lat']) : 0;
+				$markers[$mark]['lng'] = is_numeric($marker['lng']) ? floatval($marker['lng']) : 0;
+			}
 			$markers[$mark]['icon'] = ($marker['icon'] && strpos($marker['icon'], '.') ? $this->getConf('path').$marker['icon'] : $marker['icon']);
 		}
 		return $markers;
