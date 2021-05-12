@@ -10,8 +10,8 @@ lib/plugins/googlemaps3/
 Please refer to https://www.dokuwiki.org/plugins for additional info
 on how to install plugins in DokuWiki.
 
-Copyright (C) Bernard Condrau <bernard@condrau.com>,
-              Christopher Smith <chris@jalakai.co.uk>
+Copyright (C) Bernard Condrau,
+              Christopher Smith
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
