@@ -109,8 +109,10 @@ class syntax_plugin_googlemaps3 extends DokuWiki_Syntax_Plugin {
 
 		// determine width and height (inline styles) for the map image
 		if ($map['width'] || $map['height']) {
-			$style = $map['width'] ? 'width: '.$map['width'].";" : "";
-			$style .= $map['height'] ? 'height: '.$map['height'].";" : "";
+			$style = $map['width'] ? 'width: '.(is_numeric($map['width']) ? $map['width'].'px' : $map['width']).";" : "";
+			$style .= $map['height'] ? 'height: '.(is_numeric($map['height']) ? $map['height'].'px' : $map['height']).";" : "";
+//			$style = $map['width'] ? 'width: '.$map['width'].";" : "";
+//			$style .= $map['height'] ? 'height: '.$map['height'].";" : "";
 			$style = "style='$style'";
 		} else {
 			$style = '';
